@@ -27,20 +27,19 @@ const SignInForm = () => {
 
   useEffect(async () => {
     const response = await getRedirectResult(auth);
-    if (response) {
-      await createUserDocumentFromAuth(response.user);
-    }
+    // if (response) {
+    //   await createUserDocumentFromAuth(response.user);
+    // }
   }, []);
   const signInWithGoogle = async () => {
-    const { user } = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+    await signInWithGooglePopup();
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
-      const response = await signInAuthUserWithEmailAndPassword(
+      const { user } = await signInAuthUserWithEmailAndPassword(
         email,
         password
       );
