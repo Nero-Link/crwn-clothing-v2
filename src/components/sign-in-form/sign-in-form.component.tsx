@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getRedirectResult } from "firebase/auth";
@@ -9,13 +9,15 @@ import {
   createUserDocumentFromAuth,
   signInAuthUserWithEmailAndPassword,
 } from "../../utils/firebase/firebase.utils";
+import { AuthError, AuthErrorCodes } from "firebase/auth";
 import FormInput from "../form-input/form-input.component";
 import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 import {
   googleSignInStart,
   emailSignInStart,
 } from "../../store/user/user.action";
-import "./sign-in-form.styles.scss";
+import { SignInContainer, ButtonsContainer } from "./sign-in-form.styles";
+import { SignUpContainer } from "../sign-up-form/sign-up-form.styles";
 
 const defaultFormFields = {
   email: "",
@@ -31,18 +33,18 @@ const SignInForm = () => {
     setFormFields(defaultFormFields);
   };
 
-  useEffect(async () => {
-    const response = await getRedirectResult(auth);
-    // if (response) {
-    //   await createUserDocumentFromAuth(response.user);
-    // }
-  }, []);
+  // useEffect(async () => {
+  //   const response = await getRedirectResult(auth);
+  //   // if (response) {
+  //   //   await createUserDocumentFromAuth(response.user);
+  //   // }
+  // }, []);
   const signInWithGoogle = async () => {
     // await signInWithGooglePopup();
     dispatch(googleSignInStart());
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
@@ -53,11 +55,11 @@ const SignInForm = () => {
       dispatch(emailSignInStart(email, password));
       resetFormFields();
     } catch (error) {
-      switch (error.code) {
-        case "auth/wrong-password":
+      switch ((error as AuthError).code) {
+        case AuthErrorCodes.INVALID_PASSWORD:
           alert("Incorrect Password");
           break;
-        case "auth/user-not-found":
+        case AuthErrorCodes.INVALID_EMAIL:
           alert("No user associated with this email");
           break;
         default:
@@ -66,14 +68,14 @@ const SignInForm = () => {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     setFormFields({ ...formFields, [name]: value });
   };
 
   return (
-    <div className="sign-up-container">
+    <SignUpContainer>
       <h2>Already have an account?</h2>
       <span>Sign In with your email and password</span>
       <form onSubmit={handleSubmit}>
@@ -94,7 +96,7 @@ const SignInForm = () => {
           name="password"
           value={password}
         />
-        <div className="buttons-container">
+        <ButtonsContainer>
           <Button type="submit">Sign In</Button>
           <Button
             type="button"
@@ -103,16 +105,16 @@ const SignInForm = () => {
           >
             Google Popup
           </Button>
-          <Button
+          {/* <Button
             type="button"
             buttonType={BUTTON_TYPE_CLASSES.google}
             onClick={signInWithGoogleRedirect}
           >
             Google Redirect
-          </Button>
-        </div>
+          </Button> */}
+        </ButtonsContainer>
       </form>
-    </div>
+    </SignUpContainer>
   );
 };
 
