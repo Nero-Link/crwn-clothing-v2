@@ -14,6 +14,7 @@ import {
   getCurrentUser,
 } from "./utils/firebase/firebase.utils";
 import { setCurrentUser, checkUserSession } from "./store/user/user.action";
+import "./global.styles.css";
 
 const Home = lazy(() => import("./routes/home/home.component"));
 const Navigation = lazy(() =>
